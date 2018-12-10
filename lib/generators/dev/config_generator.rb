@@ -9,7 +9,10 @@ module Dev
       desc "Creates a dev configuration file."
 
       def copy_config
-        template "dev.yml.erb", "dev.yml"
+        template "dev.yml.erb", "dev.yml" do |content|
+          puts content.inspect.magenta
+          content
+        end
       end
 
     end

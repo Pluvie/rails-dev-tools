@@ -19,7 +19,7 @@ module Dev
     def initialize(config_file)
       config = YAML.load_file(config_file).deep_symbolize_keys!
       self.name = config[:dev][:project_name]
-      self.type = config[:dev][:project_type]
+      self.type = config[:dev][:project_type].try(:to_sym)
       self.folder = config[:dev][:project_folder]
       if self.type == :multi
         self.main_apps = config[:dev][:main_apps] || []
@@ -35,7 +35,7 @@ module Dev
     #
     # @return [Array<String>] le app del progetto.
     def apps
-      self.main_apps + self.engines
+      self.engines + self.main_apps
     end
 
     ##
@@ -73,12 +73,12 @@ module Dev
     def chdir_app(app_name = self.current_app)
       if self.type == :multi
         if app_name.in? self.main_apps
-          Dir.chdir "#{project.folder}/main_apps/#{app_name}"
+          Dir.chdir "#{self.folder}/main_apps/#{app_name}"
         elsif app_name.in? self.engines
-          Dir.chdir "#{project.folder}/engines/#{app_name}"
+          Dir.chdir "#{self.folder}/engines/#{app_name}"
         end
       elsif self.type == :single
-        Dir.chdir project.folder
+        Dir.chdir self.folder
       end
     end
 
