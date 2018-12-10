@@ -16,21 +16,20 @@ module Dev
             tested_apps = []
             # Controlla che le app specificate siano valide
             apps.each do |app|
-              @app = app.try(:to_sym)
-              valid_app?
-              tested_apps << @app
+              @project.valid_app?(app)
+              tested_apps << app
             end
           else
-            # Esegue i test per tutte le app
-            tested_apps = Dev::Executable::MAIN_APPS
+            # Esegue i test per tutte le main app
+            tested_apps = @project.main_apps
           end
 
-          tested_apps.each do |app|
-            @app = app
-            Dir.chdir File.join(File.expand_path('../..', Dir.pwd), folder)
+          tested_apps.each do |current_app|
+            @project.current_app = current_app
+            @project.chdir_app
 
             print "Eseguo test dell'app "
-            print @app.to_s.teal
+            print current_app.to_s.teal
             puts '..'
             puts
             test_output = exec('script -q /dev/null rspec --format documentation')

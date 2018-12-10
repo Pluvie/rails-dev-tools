@@ -11,13 +11,12 @@ module Dev
         #
         # @return [nil]
         def hotfix(command = nil, version = nil)
-          @app = File.basename Dir.pwd
           raise Dev::Executable::ExecutionError.new "Wrong command syntax: "\
             "specify whether to open or close a hotfix. "\
             "Example: dev hotfix open 1.0.0" unless command.in? [ 'open', 'close' ]
           version = version.to_s.squish
 
-          if valid_app?
+          if @project.valid_app?
             case command
             when 'open' then hotfix_open(version)
             when 'close' then hotfix_close(version)
@@ -33,7 +32,7 @@ module Dev
         # @return [nil]
         def hotfix_open(version)
           print "Preparing to open a new hotfix for app "
-          print @app.teal
+          print @project.current_app.teal
           print " with version "
           puts version.teal
           puts
@@ -51,16 +50,10 @@ module Dev
             puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
             puts
           end
-          if @app.in? @project.engines
-            version_file = "lib/#{@app}/version.rb"
-            print "\tBumping '#{version_file}' to #{version}.. "
-            version_content = File.read("#{version_file}")
-            File.open(version_file, 'w+') do |f|
-              f.puts version_content.gsub(/VERSION = '[0-9\.]+'\n/, "VERSION = '#{version}'")
-            end
-            print "√\n".green
-            puts
-          end
+          print "\tBumping release to #{version}.. "
+          @project.bump_app_release_to(version)
+          print "√\n".green
+          puts
         end
 
         ##
@@ -71,7 +64,7 @@ module Dev
         # @return [nil]
         def hotfix_close(version)
           print "Preparing to close the hotfix for app "
-          print @app.teal
+          print @project.current_app.teal
           print " with version "
           puts version.teal
           puts
