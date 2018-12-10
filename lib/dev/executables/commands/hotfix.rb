@@ -50,8 +50,8 @@ module Dev
             puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
             puts
           end
-          print "\tBumping release to #{version}.. "
-          @project.bump_app_release_to(version)
+          print "\tBumping version to #{version}.. "
+          @project.bump_app_version_to(version)
           print "√\n".green
           puts
         end
