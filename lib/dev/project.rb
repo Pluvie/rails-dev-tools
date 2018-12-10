@@ -110,6 +110,22 @@ module Dev
         `git tag`.split("\n").first
       end
     end
+
+    ##
+    # Alza la versione dell'app corrente a quella specificata.
+    #
+    # @param [String] version la versione a cui arrivare.
+    #
+    # @return [nil]
+    def bump_app_version_to(version)
+      if File.exists? self.app_version_file
+        version_file = self.app_version_file
+        version_content = File.read("#{version_file}")
+        File.open(version_file, 'w+') do |f|
+          f.puts version_content.gsub(/VERSION = '[0-9\.]+'\n/, "VERSION = '#{version}'")
+        end
+      end
+    end
     
   end
 end

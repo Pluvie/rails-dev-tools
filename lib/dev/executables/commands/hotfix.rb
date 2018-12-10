@@ -50,15 +50,10 @@ module Dev
             puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
             puts
           end
-          if File.exists? app_version_file
-            print "\tBumping '#{app_version_file}' to #{version}.. "
-            version_content = File.read("#{app_version_file}")
-            File.open(app_version_file, 'w+') do |f|
-              f.puts version_content.gsub(/VERSION = '[0-9\.]+'\n/, "VERSION = '#{version}'")
-            end
-            print "√\n".green
-            puts
-          end
+          print "\tBumping release to #{version}.. "
+          @project.bump_app_release_to(version)
+          print "√\n".green
+          puts
         end
 
         ##

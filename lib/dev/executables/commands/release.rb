@@ -61,15 +61,10 @@ module Dev
             puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
             puts
           end
-          if File.exists? app_version_file
-            print "\tBumping '#{app_version_file}' to #{version}.. "
-            version_content = File.read("#{app_version_file}")
-            File.open(app_version_file, 'w+') do |f|
-              f.puts version_content.gsub(/VERSION = '[0-9\.]+'\n/, "VERSION = '#{version}'")
-            end
-            print "√\n".green
-            puts
-          end
+          print "\tBumping release to #{version}.. "
+          @project.bump_app_release_to(version)
+          print "√\n".green
+          puts
         end
 
         ##
@@ -112,6 +107,22 @@ module Dev
             puts "\t\tDone. Output from git:".cadetblue
             puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
             puts
+
+            print "\tMerging hotfix on develop.."
+            exec "git checkout develop"
+            exec "git merge --no-ff hotfix/#{version}"
+            git_output = exec "git push origin develop"
+            if git_output.include?('fatal') or git_output.include?('rejected') or git_output.include?('error')
+              print "X\n".red
+              puts "\t\tSomething went wrong, take a look at the output from git:".indianred
+              puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".indianred
+              puts
+            else
+              print "√\n".green
+              puts "\t\tDone. Output from git:".cadetblue
+              puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
+              puts
+            end
           end
         end
 
