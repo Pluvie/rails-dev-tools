@@ -111,6 +111,7 @@ module Dev
               puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
               puts
             end
+            exec "git checkout master"
           end
         end
 
