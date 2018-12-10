@@ -5,7 +5,7 @@ require "dev/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
-  spec.name           = "dev"
+  spec.name           = "rails-dev-tools"
   spec.version        = Dev::VERSION
   spec.authors        = ["Francesco Ballardin"]
   spec.email          = ["francesco.ballardin@gmail.com"]
