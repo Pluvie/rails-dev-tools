@@ -16,7 +16,7 @@ module Dev
             "Example: dev release open 1.0.0" unless command.in? [ 'open', 'close' ]
           version = version.to_s.squish
 
-          if valid_app?
+          if @project.valid_app?
             case command
             when 'open' then release_open(version)
             when 'close' then release_close(version)

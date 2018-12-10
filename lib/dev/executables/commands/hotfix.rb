@@ -16,7 +16,7 @@ module Dev
             "Example: dev hotfix open 1.0.0" unless command.in? [ 'open', 'close' ]
           version = version.to_s.squish
 
-          if valid_app?
+          if @project.valid_app?
             case command
             when 'open' then hotfix_open(version)
             when 'close' then hotfix_close(version)

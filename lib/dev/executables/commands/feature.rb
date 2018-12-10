@@ -16,7 +16,7 @@ module Dev
             "Example: dev feature open my-new-feature" unless command.in? [ 'open', 'close' ]
           name = name.to_s.squish
 
-          if valid_app?
+          if @project.valid_app?
             case command
             when 'open' then feature_open(name)
             when 'close' then feature_close(name)
