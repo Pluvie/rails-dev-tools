@@ -1,6 +1,5 @@
 require 'rainbow'
 
-require 'dev/engine'
 require 'dev/executable'
 require 'dev/rainbow'
 require 'dev/version'

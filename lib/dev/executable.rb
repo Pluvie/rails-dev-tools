@@ -1,14 +1,9 @@
 require 'open3'
-require 'dev/executables/version'
-require 'dev/executables/setup'
-require 'dev/executables/dump'
-require 'dev/executables/pull'
-require 'dev/executables/push'
-require 'dev/executables/deploy'
-require 'dev/executables/console'
-# require 'dev/executables/logs'
-# require 'dev/executables/open'
-require 'dev/executables/test'
+require 'dev/project'
+require 'dev/executables/commands/version'
+require 'dev/executables/commands/pull'
+require 'dev/executables/commands/push'
+require 'dev/executables/commands/test'
 
 module Dev
 
@@ -21,28 +16,13 @@ module Dev
     # all'esecuzione.
     class ExecutionError < StandardError; end
 
-    include Dev::Executables::Version
-    include Dev::Executables::Setup
-    include Dev::Executables::Dump
-    include Dev::Executables::Pull
-    include Dev::Executables::Push
-    include Dev::Executables::Deploy
-    include Dev::Executables::Console
-    # include Dev::Executables::Logs
-    # include Dev::Executables::Dump
-    # include Dev::Executables::Open
-    include Dev::Executables::Test
+    include Dev::Executables::Commands::Version
+    include Dev::Executables::Commands::Pull
+    include Dev::Executables::Commands::Push
+    include Dev::Executables::Commands::Test
 
-    ##
-    # Le main app di H-Benchmark.
-    MAIN_APPS = [ :hstaff, :portal, :worker, :linkup, :api, :account ]
-
-    ##
-    # I motori di H-Benchmark.
-    ENGINES = [ :master, :reporting, :ingestion, :subscription ]
-
-    # @return [String] l'app di riferimento, presa dalle MAIN_APPS o dagli ENGINES.
-    attr_accessor :app
+    # @return [Dev::Executables::Project] il progetto di riferimento.
+    attr_accessor :project
 
     ##
     # Inizializza l'eseguibile, in base al comando passato.
@@ -51,19 +31,34 @@ module Dev
     def initialize(*argv)
       if argv[0].present?
         if self.respond_to?(argv[0])
+          # Carica i dati del progetto
+          load_project
+          # Lancia il comando passato
           if self.method(argv[0]).arity.abs > 0
             self.send(argv[0], *argv[1..-1])
           else
             self.send(argv[0])
           end
         else
-          raise ExecutionError.new "Il comando '#{argv[0]}' non è supportato. Eseguire "\
-            "'hb help' per un elenco di comandi disponibili."
+          raise ExecutionError.new "Command '#{argv[0]}' is not supported. Run "\
+            "'dev help' for a list of available commands."
         end
       else
-        raise ExecutionError.new "Passare un'opzione al comando. Eseguire 'hb help' "\
-          "per un elenco di comandi disponibili."
+        raise ExecutionError.new "Missing required parameters. Run 'dev help' "\
+          "for a list of available commands."
       end
+    end
+
+    ##
+    # Carica i dati del progetto prendendoli dal file
+    # di configurazione del file 'dev.yml'.
+    #
+    # @return [nil]
+    def load_project
+      config_file = Dir.glob("#{Dir.pwd}/**/dev.yml").first
+      raise ExecutionError.new "No valid configuration files found. Searched for a file named 'dev.yml' "\
+        "in folder #{Dir.pwd} and all its subdirectories." if config_file.nil?
+      @project = Dev::Project.new(config_file)
     end
 
     ##
@@ -71,10 +66,11 @@ module Dev
     #
     # @return [Boolean] se l'app è fra quelle esistenti.
     def valid_app?
-      if @app.in?(MAIN_APPS) or @app.in?(ENGINES)
+      if @app.in? @project.apps
         true
       else
-        raise ExecutionError.new "L'app '#{@app}' non fa parte di nessuna main_app o engine."
+        raise ExecutionError.new "The app '#{@app}' is neither a main app nor an engine "\
+          "within the project '#{@project.name}'."
       end
     end
 
@@ -84,37 +80,10 @@ module Dev
     # @return [Boolean] se l'env è fra quelli validi.
     def valid_env?
       unless @env.in? [ :production, :staging ]
-        raise ExecutionError.new "L'ambiente '#{@env}' non è valido. "\
-          "Gli ambienti validi sono 'production' o 'staging'."
+        raise ExecutionError.new "The environment '#{@env}' is not valid. "\
+          "Valid environments are 'production' or 'staging'."
       else
         true
-      end
-    end
-
-    ##
-    # Determina la cartella padre dell'app in esecuzione.
-    #
-    # @return [String] la cartella.
-    def folder
-      if @app.in? MAIN_APPS
-        "main_apps/#{@app}"
-      elsif @app.in? ENGINES
-        "engines/hbenchmark-#{@app}"
-      else
-        raise ExecutionError.new "L'app '#{@app}' non fa parte di nessuna main_app o engine."
-      end
-    end
-
-    ##
-    # Determina il server dell'env corrente.
-    #
-    # @return [String] il server.
-    def server
-      case @env
-      when :production
-        'hbmongo'
-      when :staging
-        'hbstaging'
       end
     end
 
@@ -144,66 +113,41 @@ module Dev
     # @return [nil]
     def help
       puts
-      print "H-Benchmark".aqua
-      print " - comandi disponibili:\n"
+      print "Dev".green
+      print " - available commands:\n"
       puts
       
-      print "\tversion\t\t".magenta 
-        print "Stampa la versione corrente.\n"
-        puts
-      
-      print "\tsetup\t\t".magenta
-        print "Esegue il setup per iniziare a sviluppare sul progetto.\n"
-        print "\t\t\tDeve essere lanciato su una cartella vuota.\n"
+      print "\tversion\t\t".limegreen 
+        print "Prints current version.\n"
         puts
 
-      print "\tdump\t\t".magenta
-        print "Esegue il dump del database dall'ambiente origine specificato.\n"
-        print "\t\t\tÈ possibile passare una lista di collezioni con il parametro except,\n"
-        print "\t\t\tper escludere queste collezioni dal dump.\n"
-        print "\t\t\tEsempio: "
-        print "hb dump production [except daily_data reservations ..]".hotpink
+      print "\tpull\t\t".limegreen
+        print "Pulls specified app's git repository, or pulls all apps if none are specified.\n"
+        print "\t\t\tWarning: the pulled branch is the one the app is currently on!\n"
+        print "\t\t\tExample: "
+        print "dev pull [myapp]".springgreen
         print ".\n"
         puts
 
-      print "\tpull\t\t".magenta
-        print "Esegue il pull dell'app specificata, o di tutte le app se non ne viene specificata una.\n"
-        print "\t\t\tAttenzione: il pull viene eseguito sul branch in cui si trova attualmente l'app!\n"
-        print "\t\t\tEsempio: "
-        print "hb pull [hstaff]".hotpink
-        print ".\n"
-        puts
-      
-      print "\tpush\t\t".magenta
-        print "Esegue il commit e il push dell'app specificata.\n"
-        print "\t\t\tAttenzione: il push viene eseguito sul branch in cui si trova attualmente l'app!\n"
-        print "\t\t\tEsempio: "
-        print "hb push hstaff \"messaggio di commit\"".hotpink
+      print "\tpush\t\t".limegreen
+        print "Commits and pushes the specified app.\n"
+        print "\t\t\tWarning: the pushed branch is the one the app is currently on!\n"
+        print "\t\t\tExample: "
+        print "dev push myapp \"commit message\"".springgreen
         print ".\n"
         puts
 
-      print "\tdeploy\t\t".magenta
-        print "Esegue il deploy dell'app specificata nell'ambiente specificato.\n"
-        print "\t\t\tIl deploy viene eseguito con mina.\n"
-        print "\t\t\tEsempio: "
-        print "hb deploy hstaff production".hotpink
+      print "\ttest\t\t".limegreen
+        print "Runs the app's test suite. Tests must be written with rspec.\n"
+        print "\t\t\tIt is possibile to specify which app's test suite to run.\n"
+        print "\t\t\tIf nothing is specified, all main app's test suites are run.\n"
+        print "\t\t\tExample: "
+        print "dev test mymainapp myengine".springgreen
+        print " (runs tests for 'mymainapp' and 'myengine')"
         print ".\n"
-        puts
-
-      print "\tconsole\t\t".magenta
-        print "Si collega alla console dell'app specificata nell'ambiente specificato.\n"
-        print "\t\t\tLa console viene eseguita con mina.\n"
-        print "\t\t\tEsempio: "
-        print "hb console hstaff production".hotpink
-        print ".\n"
-        puts
-
-      print "\ttest\t\t".magenta
-        print "Esegue i test dell'app. I test vengono eseguiti con il comando rspec.\n"
-        print "\t\t\tE' possibile specificare per quali app eseguire i test.\n"
-        print "\t\t\tSe non viene specificato niente, vengono eseguiti i test per tutte le app.\n"
-        print "\t\t\tEsempio: "
-        print "hb test hstaff master".hotpink
+        print "\t\t\tExample: "
+        print "dev test".springgreen
+        print " (runs tests for all main apps and engines within this project)"
         print ".\n"
         puts
     end

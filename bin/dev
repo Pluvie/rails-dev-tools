@@ -6,9 +6,7 @@ require 'dev'
 begin
   exec = Dev::Executable.new(*ARGV)
 rescue Dev::Executable::ExecutionError => e
-  puts
   puts e.message.red
-  puts
 rescue StandardError => e
   puts "#{e.class}: #{e.message}".red
   puts e.backtrace.join("\n").red

@@ -15,8 +15,7 @@ Gem::Specification.new do |spec|
   spec.license        = "MIT"
 
   spec.files          = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
-  spec.bindir         = "exe"
-  spec.executables    = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.executables    = [ "dev" ]
 
   spec.add_dependency "rails", "~> 5.2.2"
   spec.add_dependency "rainbow", "~> 2.1"
