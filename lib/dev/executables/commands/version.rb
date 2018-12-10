@@ -4,7 +4,7 @@ module Dev
       module Version
 
         ##
-        # Stampa la versione corrente di H-Benchmark.
+        # Stampa la versione corrente di Dev.
         #
         # @return [nil]
         def version

@@ -16,14 +16,14 @@ module Dev
             apps = project.apps
           end
 
-          apps.each do |app|
-            @app = app
-            if valid_app?
-              @project.chdir_app(@app)
+          apps.each do |current_app|
+            @project.current_app = current_app
+            if @project.valid_app?
+              @project.chdir_app
               current_branch = `git rev-parse --abbrev-ref HEAD`
               
               print "Preparing to pull app "
-              print @app.teal
+              print current_app.teal
               print " on branch "
               print current_branch.teal
               puts
