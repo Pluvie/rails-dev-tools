@@ -3,11 +3,4 @@
 require 'active_support/all'
 require 'dev'
 
-begin
-  exec = Dev::Executable.new(*ARGV)
-rescue Dev::Executable::ExecutionError => e
-  puts e.message.red
-rescue StandardError => e
-  puts "#{e.class}: #{e.message}".red
-  puts e.backtrace.join("\n").red
-end
+exec = Dev::Executable.new(*ARGV)

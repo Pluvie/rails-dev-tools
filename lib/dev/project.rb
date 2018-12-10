@@ -122,7 +122,7 @@ module Dev
         version_file = self.app_version_file
         version_content = File.read("#{version_file}")
         File.open(version_file, 'w+') do |f|
-          f.puts version_content.gsub(/VERSION = '[0-9\.]+'\n/, "VERSION = '#{version}'")
+          f.puts version_content.gsub(/VERSION = '[0-9\.]+'\n/, "VERSION = '#{version}'\n")
         end
       end
     end
