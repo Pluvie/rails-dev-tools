@@ -9,7 +9,7 @@ module Generators
       desc "Creates a dev configuration file."
 
       def copy_config
-        template "dev.yml.erb", "config/dev.yml"
+        template "dev.yml.erb", "dev.yml"
       end
 
     end

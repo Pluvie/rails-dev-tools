@@ -1,0 +1,42 @@
+<%# Finds out the type of the app, its name, and the name of its project -%>
+<%
+  if Dir.pwd.include?('/main_apps')
+    app_type = :main_app
+    app_name = File.basename Dir.pwd
+    project_folder = Dir.pwd.partition('/main_apps').first
+  elsif Dir.pwd.include?('/engines')
+    app_type = :engine
+    app_name = File.basename Dir.pwd
+    project_folder = Dir.pwd.partition('/engines').first
+  else
+    app_type = :single
+    app_name = File.basename Dir.pwd
+    project_name = app_name
+    project_folder = Dir.pwd
+  end
+-%>
+<%# Generates config file based on the type of the app -%>
+<%
+  case app_type
+  when :main_app, :engine
+    project_name = File.basename project_folder
+    main_apps = Dir.glob("#{project_folder}/main_apps/*").map do |main_app_folder|
+      File.basename main_app_folder
+    end
+-%>
+dev:
+  project_name: <%= project_name %>
+  project_folder: <%= project_folder %>
+  main_apps:
+    <% main_apps.each do |main_app| -%>
+    - <%= main_app %>
+    <% end -%>
+  engines:
+    <% engines.each do |engine| -%>
+    - <%= engine %>
+    <% end -%>
+<% when :single -%>
+dev:
+  project_name: <%= project_name %>
+  project_folder: <%= project_folder %>
+<% end -%>
