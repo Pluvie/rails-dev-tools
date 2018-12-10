@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.executables    = [ "dev" ]
 
   spec.add_dependency "rails", "~> 5.2.2"
-  spec.add_dependency "rainbow", "~> 2.1"
+  spec.add_dependency "rainbow", "~> 3.0"
 
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rspec-rails", "~> 3.8"

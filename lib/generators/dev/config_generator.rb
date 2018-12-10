@@ -1,7 +1,7 @@
 require 'rails/generators'
 
-module Generators
-  module Dev
+module Dev
+  module Generators
     
     class ConfigGenerator < Rails::Generators::Base
       source_root File.expand_path("../../templates", __FILE__)
