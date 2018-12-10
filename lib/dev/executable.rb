@@ -1,6 +1,8 @@
 require 'open3'
 require 'dev/project'
 require 'dev/executables/commands/version'
+require 'dev/executables/commands/feature'
+require 'dev/executables/commands/release'
 require 'dev/executables/commands/pull'
 require 'dev/executables/commands/push'
 require 'dev/executables/commands/test'
@@ -17,6 +19,8 @@ module Dev
     class ExecutionError < StandardError; end
 
     include Dev::Executables::Commands::Version
+    include Dev::Executables::Commands::Feature
+    include Dev::Executables::Commands::Release
     include Dev::Executables::Commands::Pull
     include Dev::Executables::Commands::Push
     include Dev::Executables::Commands::Test
@@ -119,6 +123,32 @@ module Dev
       
       print "\tversion\t\t".limegreen 
         print "Prints current version.\n"
+        puts
+
+      print "\tfeature\t\t".limegreen
+        print "Opens or closes a feature for the current app.\n"
+        print "\t\t\tWarning: the app is determined from the current working directory!\n"
+        print "\t\t\tExample: "
+        print "dev feature open my-new-feature".springgreen
+        print " (opens a new feature for the current app)"
+        print ".\n"
+        print "\t\t\tExample: "
+        print "dev feature close my-new-feature".springgreen
+        print " (closes a developed new feature for the current app)"
+        print ".\n"
+        puts
+
+      print "\trelease\t\t".limegreen
+        print "Opens or closes a release for the current app.\n"
+        print "\t\t\tWarning: the app is determined from the current working directory!\n"
+        print "\t\t\tExample: "
+        print "dev release open 0.2.0".springgreen
+        print " (opens a new release for the current app)"
+        print ".\n"
+        print "\t\t\tExample: "
+        print "dev release close 0.2.0".springgreen
+        print " (closes a developed new release for the current app)"
+        print ".\n"
         puts
 
       print "\tpull\t\t".limegreen
