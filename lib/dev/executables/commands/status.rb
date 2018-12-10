@@ -11,7 +11,7 @@ module Dev
           if app.present?
             apps = [ app ]
           else
-            apps = project.apps
+            apps = @project.apps
           end
 
           apps.each do |current_app|
