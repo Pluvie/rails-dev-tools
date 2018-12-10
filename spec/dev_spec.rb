@@ -4,8 +4,14 @@ RSpec.describe Dev do
     expect(Dev::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "responds to version command" do
+    exec = Dev::Executable.new('version')
+    expect(exec.error).to be nil
+  end
+
+  it "responds to status command" do
+    exec = Dev::Executable.new('status')
+    expect(exec.error).to be nil
   end
 
 end

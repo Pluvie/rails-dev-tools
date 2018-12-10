@@ -31,29 +31,43 @@ module Dev
 
     # @return [Dev::Executables::Project] il progetto di riferimento.
     attr_accessor :project
+    # @return [StandardError] l'errore riscontrato, se presente.
+    attr_accessor :error
+    # @return [String] il backtrace dell'errore, se presente.
+    attr_accessor :backtrace
 
     ##
     # Inizializza l'eseguibile, in base al comando passato.
     #
     # @param [Array] argv gli argomenti del comando.
     def initialize(*argv)
-      if argv[0].present?
-        if self.respond_to?(argv[0])
-          # Carica i dati del progetto
-          load_project
-          # Lancia il comando passato
-          if self.method(argv[0]).arity.abs > 0
-            self.send(argv[0], *argv[1..-1])
+      begin
+        if argv[0].present?
+          if self.respond_to?(argv[0])
+            # Carica i dati del progetto
+            load_project
+            # Lancia il comando passato
+            if self.method(argv[0]).arity.abs > 0
+              self.send(argv[0], *argv[1..-1])
+            else
+              self.send(argv[0])
+            end
           else
-            self.send(argv[0])
+            raise ExecutionError.new "Command '#{argv[0]}' is not supported. Run "\
+              "'dev help' for a list of available commands."
           end
         else
-          raise ExecutionError.new "Command '#{argv[0]}' is not supported. Run "\
-            "'dev help' for a list of available commands."
+          raise ExecutionError.new "Missing required parameters. Run 'dev help' "\
+            "for a list of available commands."
         end
-      else
-        raise ExecutionError.new "Missing required parameters. Run 'dev help' "\
-          "for a list of available commands."
+      rescue Dev::Executable::ExecutionError => e
+        @error = e.message
+        puts @error.red
+      rescue StandardError => e
+        @error = "#{e.class}: #{e.message}"
+        @backtrace = e.backtrace.join("\n")
+        puts @error.red
+        puts @backtrace.red
       end
     end
 
