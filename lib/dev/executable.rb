@@ -1,6 +1,7 @@
 require 'open3'
 require 'dev/project'
 require 'dev/executables/commands/version'
+require 'dev/executables/commands/status'
 require 'dev/executables/commands/feature'
 require 'dev/executables/commands/hotfix'
 require 'dev/executables/commands/release'
@@ -20,6 +21,7 @@ module Dev
     class ExecutionError < StandardError; end
 
     include Dev::Executables::Commands::Version
+    include Dev::Executables::Commands::Status
     include Dev::Executables::Commands::Feature
     include Dev::Executables::Commands::Hotfix
     include Dev::Executables::Commands::Release
@@ -65,19 +67,6 @@ module Dev
       raise ExecutionError.new "No valid configuration files found. Searched for a file named 'dev.yml' "\
         "in folder #{Dir.pwd} and all its subdirectories." if config_file.nil?
       @project = Dev::Project.new(config_file)
-    end
-
-    ##
-    # Determina se l'app è valida.
-    #
-    # @return [Boolean] se l'app è fra quelle esistenti.
-    def valid_app?
-      if @app.in? @project.apps
-        true
-      else
-        raise ExecutionError.new "The app '#{@app}' is neither a main app nor an engine "\
-          "within the project '#{@project.name}'."
-      end
     end
 
     ##

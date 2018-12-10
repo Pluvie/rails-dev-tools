@@ -11,7 +11,6 @@ module Dev
         #
         # @return [nil]
         def feature(command = nil, name = nil)
-          @app = File.basename Dir.pwd
           raise Dev::Executable::ExecutionError.new "Wrong command syntax: "\
             "specify whether to open or close a feature. "\
             "Example: dev feature open my-new-feature" unless command.in? [ 'open', 'close' ]
@@ -33,7 +32,7 @@ module Dev
         # @return [nil]
         def feature_open(name)
           print "Preparing to open a new feature for app "
-          print @app.teal
+          print @project.current_app.teal
           print " named "
           puts name.teal
           puts
@@ -72,7 +71,7 @@ module Dev
         # @return [nil]
         def feature_close(name)
           print "Preparing to close the feature for app "
-          print @app.teal
+          print @project.current_app.teal
           print " named "
           puts name.teal
           puts

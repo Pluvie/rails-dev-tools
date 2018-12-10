@@ -12,13 +12,13 @@ module Dev
         # @return [nil]
         def push(app = nil, commit_message = nil)
           if app.present? and commit_message.present?
-            @app = app
-            if valid_app?
-              @project.chdir_app(@app)
+            @project.current_app = app
+            if @project.valid_app?
+              @project.chdir_app
               current_branch = `git rev-parse --abbrev-ref HEAD`
               
               print "Preparing to push app "
-              print @app.teal
+              print @project.current_app.teal
               print " on branch "
               print current_branch.teal
               puts
