@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dev (1.1.1)
+    rails-dev-tools (1.1.2)
       rails (~> 5.2.2)
       rainbow (~> 2.1)
 
@@ -145,7 +145,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  dev!
+  rails-dev-tools!
   rspec (~> 3.0)
   rspec-rails (~> 3.8)
   sqlite3 (~> 1.3)
