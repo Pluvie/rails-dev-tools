@@ -102,7 +102,7 @@ module Dev
           print "\tClosing.. "
           exec "git checkout master"
           exec "git merge --no-ff release/#{version}"
-          exec "git tag -a #{version}"
+          exec "git tag -a #{version} -m \"release #{version}\""
           git_output = exec "git push origin master"
           if git_output.include?('fatal') or git_output.include?('rejected') or git_output.include?('error')
             print "X\n".red
