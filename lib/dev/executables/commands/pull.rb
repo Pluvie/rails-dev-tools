@@ -20,15 +20,16 @@ module Dev
             @app = app
             if valid_app?
               @project.chdir_app(@app)
+              current_branch = `git rev-parse --abbrev-ref HEAD`
               
               print "Preparing to pull app "
               print @app.teal
               print " on branch "
-              print `git rev-parse --abbrev-ref HEAD`.teal
+              print current_branch.teal
               puts
 
               print "\tPulling.. "
-              remote_message = exec 'git pull'
+              remote_message = exec "git pull origin #{current_branch}"
               if remote_message.include?('fatal') or remote_message.include?('rejected') or remote_message.include?('error')
                 print "X\n".red
                 puts "\t\tSomething went wrong, take a look at the output from git remote:".indianred
