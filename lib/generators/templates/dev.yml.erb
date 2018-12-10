@@ -23,6 +23,9 @@
     main_apps = Dir.glob("#{project_folder}/main_apps/*").map do |main_app_folder|
       File.basename main_app_folder
     end
+    engines = Dir.glob("#{project_folder}/engines/*").map do |engine_folder|
+      File.basename engine_folder
+    end
 -%>
 dev:
   project_type: <%= project_type %>
