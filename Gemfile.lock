@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails-dev-tools (1.1.6)
+    rails-dev-tools (1.2.0)
       rails (~> 5.2.2)
       rainbow (~> 3.0)
 
