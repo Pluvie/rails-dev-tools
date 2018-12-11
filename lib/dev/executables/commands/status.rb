@@ -17,7 +17,7 @@ module Dev
           apps.each do |current_app|
             @project.current_app = current_app
             if @project.valid_app?
-              @project.chdir_app
+              Dir.chdir @project.app_folder
               current_branch = `git rev-parse --abbrev-ref HEAD`
 
               print "Status of app "

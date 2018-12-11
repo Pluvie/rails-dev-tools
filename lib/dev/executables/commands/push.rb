@@ -14,7 +14,7 @@ module Dev
           if app.present? and commit_message.present?
             @project.current_app = app
             if @project.valid_app?
-              @project.chdir_app
+              Dir.chdir @project.app_folder
               current_branch = `git rev-parse --abbrev-ref HEAD`
               
               print "Preparing to push app "

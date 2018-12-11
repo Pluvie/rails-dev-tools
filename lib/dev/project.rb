@@ -63,22 +63,22 @@ module Dev
     end
 
     ##
-    # Sposta la directory corrente nella cartella
+    # Ottiene la directory corrente nella cartella
     # dell'app specificata. Prende l'app corrente se non
     # viene specificata nessuna app.
     #
     # @param [String] app_name il nome dell'app.
     #
     # @return [nil]
-    def chdir_app(app_name = self.current_app)
+    def app_folder(app_name = self.current_app)
       if self.type == :multi
         if app_name.in? self.main_apps
-          Dir.chdir "#{self.folder}/main_apps/#{app_name}"
+          "#{self.folder}/main_apps/#{app_name}"
         elsif app_name.in? self.engines
-          Dir.chdir "#{self.folder}/engines/#{app_name}"
+          "#{self.folder}/engines/#{app_name}"
         end
       elsif self.type == :single
-        Dir.chdir self.folder
+        self.folder
       end
     end
 
@@ -90,7 +90,9 @@ module Dev
     #
     # @return [String] il file di versione dell'app.
     def app_version_file(app_name = self.current_app)
-      "lib/#{app_name}/version.rb"
+      Dir.glob("#{app_folder(app_name)}/lib/**/version.rb").min do |file_name|
+        file_name.chars.count
+      end
     end
 
     ##
@@ -102,8 +104,8 @@ module Dev
     # @return [String] la versione dell'app.
     def app_version(app_name = self.current_app)
       chdir_app(app_name)
-      if File.exists? "lib/#{app_name}/version.rb"
-        File.read("lib/#{app_name}/version.rb")
+      if File.exists? app_version_file(app_name).to_s
+        File.read(app_version_file(app_name))
           .match(/VERSION = '([0-9\.]+)'\n/)
           .try(:captures).try(:first)
       else
