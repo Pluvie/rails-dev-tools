@@ -106,11 +106,10 @@ module Dev
             print "√\n".green
             puts "\t\tDone. Output from git:".cadetblue
             puts "\t\t#{git_output.split("\n").map(&:squish).join("\n\t\t")}".cadetblue
-            puts
 
-            print "\tMerging hotfix on develop.."
+            print "\tMerging release on develop.."
             exec "git checkout develop"
-            exec "git merge --no-ff hotfix/#{version}"
+            exec "git merge --no-ff release/#{version}"
             git_output = exec "git push origin develop"
             if git_output.include?('fatal') or git_output.include?('rejected') or git_output.include?('error')
               print "X\n".red
