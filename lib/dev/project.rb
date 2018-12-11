@@ -90,8 +90,8 @@ module Dev
     #
     # @return [String] il file di versione dell'app.
     def app_version_file(app_name = self.current_app)
-      Dir.glob("#{app_folder(app_name)}/lib/**/version.rb").min do |file_name|
-        file_name.chars.count
+      Dir.glob("#{app_folder(app_name)}/lib/**/version.rb").min_by do |filename|
+        filename.chars.count
       end
     end
 
