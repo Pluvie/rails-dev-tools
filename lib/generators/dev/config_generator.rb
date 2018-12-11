@@ -10,7 +10,6 @@ module Dev
 
       def copy_config
         template "dev.yml.erb", "dev.yml" do |content|
-          puts content.inspect.magenta
           content
         end
       end
