@@ -26,7 +26,7 @@ module Dev
 
           tested_apps.each do |current_app|
             @project.current_app = current_app
-            @project.chdir_app
+            Dir.chdir @project.app_folder
 
             print "Eseguo test dell'app "
             print current_app.to_s.teal
