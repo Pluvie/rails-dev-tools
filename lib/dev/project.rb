@@ -103,7 +103,6 @@ module Dev
     #
     # @return [String] la versione dell'app.
     def app_version(app_name = self.current_app)
-      chdir_app(app_name)
       if File.exists? app_version_file(app_name).to_s
         File.read(app_version_file(app_name))
           .match(/VERSION = '([0-9\.]+)'\n/)
